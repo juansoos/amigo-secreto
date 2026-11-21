@@ -119,7 +119,6 @@ img{max-width:100%}
         <h2>El evento</h2>
         <label class="f">Nombre del sorteo<input type="text" id="ev-name" placeholder="Intercambio de Navidad"></label>
         <div class="row">
-          <label class="f">Presupuesto<input type="text" id="ev-budget" placeholder="$80.000 COP"></label>
           <label class="f">Fecha de entrega<input type="date" id="ev-date"></label>
         </div>
         <label class="f">Enlace de esta página (para incluirlo en los mensajes)<input type="text" id="ev-link" placeholder="Se usa la dirección de esta página si lo dejas vacío"></label>
@@ -215,7 +214,7 @@ let uid = 1;
 const newId = () => "p" + (uid++) + Math.random().toString(36).slice(2,6);
 
 let S = {
-  event:{name:"",budget:"",date:"",link:""},
+  event:{name:"",date:"",link:""},
   people: SAMPLE.map(n=>({id:newId(),name:n})),
   sample:true,
   excl:[], noRecip:true, results:null, stale:false, peek:false
@@ -304,14 +303,12 @@ function fmtDate(d){ if(!d) return ""; try{ return new Date(d+"T12:00:00").toLoc
 function message(r){
   const ev = S.event, L = [];
   L.push(`¡Hola ${r.giver}! 🎁 Ya se hizo el sorteo${ev.name?` de *${ev.name}*`:" del amigo secreto"}.`);
-  if(ev.budget) L.push(`Presupuesto: ${ev.budget}`);
   if(ev.date) L.push(`Entrega: ${fmtDate(ev.date)}`);
   L.push("");
   const link = (ev.link || HERE).trim();
   if(link){
     L.push(`Abre este enlace para ver a quién le regalas:`);
     L.push(`${link.split("#")[0]}#c-${r.code}`);
-    L.push("", `Si no abre directo, entra a ${link.split("#")[0]} , toca “Ver mi amigo secreto” y pega este código: ${r.code}`);
   } else {
     L.push(`Abre la página del sorteo, toca “Ver mi amigo secreto” y pega tu código:`);
     L.push(r.code);
@@ -337,7 +334,7 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 function markStale(){ if(S.results) S.stale = true; S.sample = false; save(); render(); }
 
 function render(){
-  ["name","budget","date","link"].forEach(k=>{ const el=$("ev-"+k); if(document.activeElement!==el) el.value=S.event[k]||""; });
+  ["name","date","link"].forEach(k=>{ const el=$("ev-"+k); if(document.activeElement!==el) el.value=S.event[k]||""; });
   $("count").textContent = S.people.length;
   $("sample-note").hidden = !S.sample;
   $("people").innerHTML = S.people.map(p=>`<li class="chip">${esc(p.name)}<button aria-label="Quitar ${esc(p.name)}" data-rm="${p.id}">×</button></li>`).join("");
@@ -371,7 +368,7 @@ function render(){
 }
 
 /* ---------- events ---------- */
-["name","budget","date","link"].forEach(k=>$("ev-"+k).addEventListener("input",e=>{ S.event[k]=e.target.value; save(); }));
+["name","date","link"].forEach(k=>$("ev-"+k).addEventListener("input",e=>{ S.event[k]=e.target.value; save(); }));
 $("add-form").addEventListener("submit",e=>{
   e.preventDefault();
   const names = $("add-name").value.split(/[,\n]/).map(s=>s.trim()).filter(Boolean);
